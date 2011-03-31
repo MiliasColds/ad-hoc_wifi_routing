@@ -1,8 +1,10 @@
-#include <stdio>
+#include <stdio.h>
 
-void main(int argc, char[] argv){
+//using namespace std;
 
-	printf("Hello World! ;-P";
-	exit(0);
+int main( char** argv,int argc){
+
+	printf("Hello World! ;-P");
+	return 0;
 
 }
