@@ -8,7 +8,7 @@ using namespace std;
 class address {
 public :
   short A,B,C,D;
-  char[15] addr;
+  char[16] addr;
   
   address(char **addr){
 	strcpy(this.addr,addr*);
