@@ -1,114 +1,133 @@
-#include <vector.h>
-#include <string.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <math.h>
+#include <vector>
+#include <string>
+#include <cstdio>
+#include <iostream>
+#include <cmath>
 
 using namespace std;
+
 class address {
 public :
   short A,B,C,D;
-  char[16] addr;
+  char addr[16];
   
-  address(char **addr){
-	strcpy(this.addr,addr*);
-	char *tok = strtok(this.addr,".");
-	short x = 0;
-	while(strlen(tok)>0){
-	short n = itof(tok);
-	switch(x) {
-	  case 0:
-		this.A = n;
-		break;
-	  case 1:
-		this.B = n;
-		break;
-	  case 2:
-		this.C = n;
-		break;
-	  case 3:
-		this.D = n;
-		break;
-	  }
-	x++;
-	}
+	address(){ }
+  address(char inaddr[16]){
+		strcpy(addr, inaddr);
+		char *tok = strtok(addr,".");
+		short x = 0;
+		while(strlen(tok)>0){
+			short n = atoi(tok);
+			switch(x) {
+				case 0:
+				A = n;
+				break;
+				case 1:
+				B = n;
+				break;
+				case 2:
+				C = n;
+				break;
+				case 3:
+				D = n;
+				break;
+			}
+			x++;
+		}
   }
   
   short getOctet(short x){
 	switch(x) {
 	  case 0:
-		return this.A;
+		return A;
 	  case 1:
-		return this.B;
+		return B;
 	  case 2:
-		return this.C;
+		return C;
 	  case 3:
-		return this.D;
+		return D;
 	  }
   }
   
   bool equals(address *comp){
-	if(comp->A==this.A&&
-		comp->B = this.B &&
-		comp->C = this.C &&
-		comp->D = this.D){
+		if(comp->A==A &&
+			comp->B == B &&
+			comp->C == C &&
+			comp->D == D){
+			
+			return true;
+		}
+		return false;
 		
-		return true;
 	}
-	return false;
-  
-}
+};
 
 
 class Table_Entry{
-  address dest,next;
+	public:
+	address dest,next;
   
   Table_Entry(address dest_addr, address next_addr){
-	this.dest = dest_addr;
-	this.next = next_addr;
+		dest = dest_addr;
+		next = next_addr;
   }
 
-}
+};
  
 class RouteTable {
+	public:
 	vector<Table_Entry> table;
 	
 	RouteTable(){
-		this.table = vector<Table_Entry>();
+		table = vector<Table_Entry>();
 	}
 	
 	void addEntry(address dest, address next){
 		Table_Entry t = Table_Entry(dest,next);
-		this.table.push_back(t);
+		table.push_back(t);
 	}
 	
 	address getToAddress(address dest){
-		for (std::vector<Table_Entry>::iterator i = this.table.begin(); i != this.table.end(); ++i) { //Iterate through 'items'
-			if((*i).dest.equals(dest)){
+		for (std::vector<Table_Entry>::iterator i = table.begin(); i != table.end(); ++i) { //Iterate through 'items'
+			if((*i).dest.equals(&dest)){
 				return (*i).next;
 			}
 		}
 	}
 	
 	void removeEntry_bydest(address dest) {
-		for (std::vector<Table_Entry>::iterator i = this.table.begin(); i != this.table.end(); ++i) { //Iterate through 'items'
-			if((*i).dest.equals(dest)){
-				this.table.erase(i);
+		for (std::vector<Table_Entry>::iterator i = table.begin(); i != table.end(); ++i) { //Iterate through 'items'
+			if((*i).dest.equals(&dest)){
+				table.erase(i);
 			}
 		}
 	}
 	
 	void removeEntry_bynext(address next) {
-		for (std::vector<Table_Entry>::iterator i = this.table.begin(); i != this.table.end(); ++i) { //Iterate through 'items'
-			if((*i).next.equals(next)){
-				this.table.erase(i);
+		for (std::vector<Table_Entry>::iterator i = table.begin(); i != table.end(); ++i) { //Iterate through 'items'
+			if((*i).next.equals(&next)){
+				table.erase(i);
 			}
 		}
 	}
-}
+};
 
+typedef enum {ACK, DAT} packettype;
 
+class packet {
+public:
+	packettype type;
+	address dest;
+	int size;
+	char data[30];
+	int current_num_ints;
 	
+	packet(packettype pt, address d, int s, char indat[30], int n){
+		type = pt;
+		dest = d;
+		size = s;
+		strncpy(data, indat, 30);
+		current_num_ints = n;
+	}
 	
- 
-  
+};
