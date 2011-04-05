@@ -57,12 +57,10 @@ int main(int argc, char* argv[]){
 	bcopy((char *)server->h_addr, 
          (char *)&remote_address.sin_addr.s_addr,
          server->h_length);
-	 if (connect(sout,(struct sockaddr_in *) &remote_address,sizeof(remote_address)) < 0) 
-		error("ERROR connecting");
 	unsigned int remote_length = sizeof(struct sockaddr_in);
 	
-	int n = write(sout,packet,sizeof(packet));//,0,
-					//(struct sockaddr *)&remote_address, &remote_length);
+	int n = send_to(sout,packet,sizeof(packet),0,
+					(struct sockaddr *)&remote_address, &remote_length);
 	if (n < 0) error("Sendto Error\n");
 	
 	close(sout);
