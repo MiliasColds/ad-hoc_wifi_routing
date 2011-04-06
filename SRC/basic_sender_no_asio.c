@@ -9,7 +9,6 @@
 #include <unistd.h>
 #include <string.h>
 
-
 #include "classdefs.h"
 
 
@@ -59,10 +58,14 @@ int main(int argc, char* argv[]){
 	// bind socket to UDP port
 	remote_address.sin_family = AF_INET;
 	remote_address.sin_port = htons(port);
-	bcopy((char *)server->h_addr, 
-         (char *)&remote_address.sin_addr.s_addr,
-         server->h_length);
+	inet_aton(static_route_destination.addr, &remote_address.sin_addr);
+	
 	unsigned int remote_length = sizeof(struct sockaddr_in);
+	
+	//char* charpacket = p.tocharstar();
+	
+	//int n = sendto(sout,(void*)&p,sizeof(packet),0,
+	//				(struct sockaddr *)&remote_address, sizeof(struct sockaddr_in));
 	
 	int n = sendto(sout,(void*)&p,sizeof(packet),0,
 					(struct sockaddr *)&remote_address, sizeof(struct sockaddr_in));

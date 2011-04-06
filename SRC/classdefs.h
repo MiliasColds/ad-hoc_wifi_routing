@@ -1,8 +1,10 @@
 #include <vector>
-#include <string>
+
 #include <cstdio>
-#include <iostream>
 #include <cmath>
+
+#include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -13,10 +15,12 @@ public :
   
 	address(){ }
   address(char inaddr[16]){
+		std::cerr << "hallo address constructor\n";
+
 		strcpy(addr, inaddr);
 		char *tok = strtok(addr,".");
 		short x = 0;
-		while(strlen(tok)>0){
+		while(tok !=  NULL){
 			short n = atoi(tok);
 			switch(x) {
 				case 0:
@@ -32,8 +36,12 @@ public :
 				D = n;
 				break;
 			}
+			std::cerr << "hallo address loop\n";
+			tok = strtok(NULL,".");
 			x++;
 		}
+			std::cerr << "hallo\n";
+
   }
   
   short getOctet(short x){
@@ -129,5 +137,46 @@ public:
 		strncpy(data, indat, 30);
 		current_num_ints = n;
 	}
+	packet(string buffer){
+		char temp[30];
+		//strncpy(temp, buffer, 
+		
+	}
+	char* tocharstar(){
+		char* chartype;
+		chartype = (char*)&type;
+		
+		char chardest[16];
+		strncpy(chardest, dest.addr, 16);
+		
+		char* charsize;
+		charsize = (char*)&size;
+		
+		char chardata[30];
+		strncpy(chardata, data, 30);
+		
+		char* charn;
+		charn = (char*)&current_num_ints;
+		
+		char* out = (char*)malloc(49*sizeof(char));
+		strcpy(out, chartype);
+		strcat(out, chardest);
+		strcat(out, charsize);
+		strcat(out, chardata);
+		strcat(out, charn);
+		
+		return out;
+	}
 	
 };
+
+typedef struct{
+	packettype type;			//type of packet ACK or DATA
+	char dest[16];			//destination
+	int size;				//size of data field
+	char data[30];		//maximum size of data payload
+	int current_num_ints;		//number of intermediate nodes
+						//traversed by packet
+	char intermediate_nodes[8][16]; //array to hold ip
+// addresses of intermediate nodes
+} PACKET;
