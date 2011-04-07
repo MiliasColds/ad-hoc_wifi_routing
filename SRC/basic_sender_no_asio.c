@@ -57,14 +57,10 @@ int main(int argc, char* argv[]){
 	}
 	
 	// bind socket to UDP port
-	memset(&remote_address, 0, sizeof(remote_address));
 	remote_address.sin_family = AF_INET;
 	remote_address.sin_port = htons(port);
 	//remote_address.sin_addr.s_addr = inet_addr(string_route_destination);
-	if (inet_aton(string_route_destination, &remote_address.sin_addr) ==0 ){
-		cout<<"address error\n";
-		return 1;
-	}
+	inet_aton(static_route_next.addr, &remote_address.sin_addr);
 	
 	socklen_t remote_length = sizeof(struct sockaddr_in);
 	
@@ -72,6 +68,7 @@ int main(int argc, char* argv[]){
 	
 	//int n = sendto(sout,(void*)&p,sizeof(packet),0,
 	//				(struct sockaddr *)&remote_address, sizeof(struct sockaddr_in));
+	cout << "packet:"<<p.data <<", "<<p.dest.addr<<"\n";
 	packet *j = &p;
 	int n = sendto(sout,(void*)j,sizeof(packet),0,
 					(struct sockaddr *)&remote_address, remote_length);

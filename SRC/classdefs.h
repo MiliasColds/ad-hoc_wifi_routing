@@ -18,10 +18,11 @@ public :
 		std::cerr << "hallo address constructor\n";
 
 		strcpy(addr, inaddr);
-		char *tok = strtok(addr,".");
+		char *tok = strtok(inaddr,".");
 		short x = 0;
 		while(tok !=  NULL){
 			short n = atoi(tok);
+			cout<<"n:"<<n<<"\n";
 			switch(x) {
 				case 0:
 				A = n;
