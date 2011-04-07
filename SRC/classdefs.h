@@ -36,11 +36,11 @@ public :
 				D = n;
 				break;
 			}
-			std::cerr << "hallo address loop\n";
+			//std::cerr << "hallo address loop\n";
 			tok = strtok(NULL,".");
 			x++;
 		}
-			std::cerr << "hallo\n";
+			//std::cerr << "hallo\n";
 
   }
   
@@ -130,6 +130,7 @@ public:
 	char data[30];
 	int current_num_ints;
 	
+	packet(){dest = address();};
 	packet(packettype pt, address d, int s, char indat[30], int n){
 		type = pt;
 		dest = d;

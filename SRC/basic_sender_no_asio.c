@@ -37,7 +37,7 @@ int main(int argc, char* argv[]){
 	//initialize the static route table
 	RouteTable table = RouteTable();
 	table.addEntry(static_route_destination, static_route_next);
-	server = gethostbyname(string_route_next);
+	//server = gethostbyname(string_route_next);
 	//make the packet
 	char data[30] = "the good the bad and the ugly";
 	size_t request_length = strlen(data);
@@ -50,15 +50,17 @@ int main(int argc, char* argv[]){
 		0);
 	
 	// allocate socket
-	int sout = socket(AF_INET, SOCK_STREAM, 0);
+	int sout = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sout < 0){
+		cout<<"socket create failed\n";
 		//error("Socket Error\n");
 	}
 	
 	// bind socket to UDP port
 	remote_address.sin_family = AF_INET;
 	remote_address.sin_port = htons(port);
-	inet_aton(static_route_destination.addr, &remote_address.sin_addr);
+	//remote_address.sin_addr.s_addr = inet_addr(string_route_destination);
+	inet_aton(string_route_destination, &remote_address.sin_addr);
 	
 	unsigned int remote_length = sizeof(struct sockaddr_in);
 	
@@ -66,13 +68,14 @@ int main(int argc, char* argv[]){
 	
 	//int n = sendto(sout,(void*)&p,sizeof(packet),0,
 	//				(struct sockaddr *)&remote_address, sizeof(struct sockaddr_in));
-	
-	int n = sendto(sout,(void*)&p,sizeof(packet),0,
-					(struct sockaddr *)&remote_address, sizeof(struct sockaddr_in));
+	packet *j = &p;
+	int n = sendto(sout,(void*)j,sizeof(packet),0,
+					(struct sockaddr *)&remote_address, &remote_length);
 	if (n < 0){
 		//error("Sendto Error\n");
+		cout<<"send error\n";
 	}
-	
+	cout << "data sent";
 	close(sout);
 	return 0;
 }

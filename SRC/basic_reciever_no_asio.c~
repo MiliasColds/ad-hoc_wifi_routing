@@ -53,7 +53,7 @@ int main(int argc, char* argv[]){
 	cout << "waiting for message\n";
 	while(1){
 		//recieve packet
-		n = recvfrom(sin,buffer,256,0,(struct sockaddr *)&remote_address,&packet_length);
+		n = recvfrom(sin,(void *)&p,sizeof(packet),0,(struct sockaddr *)&remote_address,&packet_length);
 		if (n < 0){
 			//error("recvfrom");
 			cout<<"error recieving\n";
