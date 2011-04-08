@@ -83,7 +83,10 @@ int main(int argc, char* argv[]){
 					
 					//get the next address from the table
 					address next = table.getToAddress(p.dest);
-			
+					
+					//clear out the data string
+					strcpy(p.data, "");
+					
 					//make the packet
 					packet q = packet(						//construct packet
 						ACK,

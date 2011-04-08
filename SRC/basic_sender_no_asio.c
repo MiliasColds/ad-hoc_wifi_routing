@@ -61,21 +61,34 @@ int main(int argc, char* argv[]){
 			//grab a socket to listen on
 			int sin = allocateListenSocket(port, &local_sockaddress);
 			
+			//make the FHP packet
+			packet p = packet(						//construct packet
+				FHP,
+				local_raddress,
+				dest_raddress,
+				strlen(buffer),
+				buffer,
+				0);
+				
+			packet *j = &p;
+				
+			
+			//send the FHP packet
+			sendPacket( port, j, &remote_sockaddress, next);
+			
 			//file loop - send packet, clear buffer, wait for recieve
 			while(ch!=EOF && count <= 30){
 				
 				if(count == 30){
 					
 					//make the packet
-					packet p = packet(						//construct packet
+					p = packet(						//construct packet
 						DAT,
 						local_raddress,
 						dest_raddress,
 						strlen(buffer),
 						buffer,
 						0);
-						
-					packet *j = &p;
 						
 					
 					//actually send the packet
@@ -116,6 +129,21 @@ int main(int argc, char* argv[]){
 					ch = getc(fp);
 				}
 			}
+			
+			//clear out the data string
+			strcpy(buffer, "");
+					
+			//make the EOM packet
+			p = packet(						//construct packet
+				EOM,
+				local_raddress,
+				dest_raddress,
+				strlen(buffer),
+				buffer,
+				0);
+				
+			//send the FHP packet
+			sendPacket( port, j, &remote_sockaddress, next);
 			
 			return 0;
 		}
