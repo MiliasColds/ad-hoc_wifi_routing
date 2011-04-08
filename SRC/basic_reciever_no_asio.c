@@ -14,7 +14,7 @@
 
 int main(int argc, char* argv[]){
 	if (argc < 4){
-		std::cerr << "Usage: basic_reciever <own address> <forwarding address> <port>\n";
+		std::cerr << "Usage: basic_reciever <my address> <forwarding address> <port>\n";
 		return 1;
 	}
 	

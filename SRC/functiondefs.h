@@ -123,7 +123,7 @@ int sendPacket(int port, packet* p, sockaddr_in* dest, address next){
 	// setup socket
 	
 	dest->sin_family = AF_INET;
-	dest->sin_port = port;
+	dest->sin_port = htons(port);
 	//remote_address.sin_addr.s_addr = inet_addr(string_route_destination);
 	inet_aton(next.addr, &(dest->sin_addr));
 	
