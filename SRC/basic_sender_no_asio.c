@@ -15,10 +15,12 @@
 int main(int argc, char* argv[]){
 	if (argc < 4){
 		std::cerr << "Usage: basic_sender <route_dest> <route_next> <port>\n";
+		std::cerr << "or: basic_sender <route_dest> <route_next> <port> -f\n";
+
 		return 1;
   }
   
-	struct sockaddr_in local_address, remote_address;
+  struct sockaddr_in local_address, remote_address;
 	struct hostent *server;
 	
 	char string_route_destination[16];
@@ -34,15 +36,6 @@ int main(int argc, char* argv[]){
 	address static_route_destination = address( string_route_destination );
 	address static_route_next = address( string_route_next );
 	
-	//initialize the static route table
-	RouteTable table = RouteTable();
-	table.addEntry(static_route_destination, static_route_next);
-	//server = gethostbyname(string_route_next);
-	//make the packet
-	
-	
-	
-	
 	// allocate socket
 	int sout = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sout < 0){
@@ -50,7 +43,7 @@ int main(int argc, char* argv[]){
 		//error("Socket Error\n");
 	}
 	
-	// setup socket to UDP port
+	// setup socket
 	remote_address.sin_family = AF_INET;
 	remote_address.sin_port = htons(port);
 	//remote_address.sin_addr.s_addr = inet_addr(string_route_destination);
@@ -58,20 +51,75 @@ int main(int argc, char* argv[]){
 	
 	socklen_t remote_length = sizeof(struct sockaddr_in);
 	
-	//char* charpacket = p.tocharstar();
+	//initialize the static route table
+	RouteTable table = RouteTable();
+	table.addEntry(static_route_destination, static_route_next);
+	//server = gethostbyname(string_route_next);
 	
-	//int n = sendto(sout,(void*)&p,sizeof(packet),0,
-	//				(struct sockaddr *)&remote_address, sizeof(struct sockaddr_in));
-	
+	//beginning of -f option code (MAIN WIFI LAB CODE)
+  if(argc > 4){
+		if(argv[4] == "-f"){
+			//read file instead of read text
+			cin >> buffer;
+			
+			//open file for reading
+			FILE *fp = fopen(argv[4],"r");
+			
+			int count = 0;
+			char ch = getc(fp);
+			
+			//file loop - send packet, clear buffer, wait for recieve
+			while(ch!=EOF){
+				if(count == 30){
+					
+					//make the packet
+					packet p = packet(						//construct packet
+						DAT,
+						static_route_destination,
+						request_length,
+						buffer,
+						0);
+						
+					cout << "packet:"<<p.data <<", "<<p.dest.addr<<"\n";
+					packet *j = &p;
+					
+					//actually send the packet
+					int n = sendto(sout,(void*)j,sizeof(packet),0,
+									(struct sockaddr *)&remote_address, strlen(buffer));
+					if (n < 0){										//error checking
+						cout<<"send error\n";
+					}
+					cout << "data sent\n";
+					
+					//wait for ack...
+					
+					//finally, got ack, continue
+					
+					
+					count = 0;
+				}
+				buffer[count] = ch;
+				count++;
+				ch = getc(fp);
+			}
+			
+			return;
+		}
+		
+	}
+	//end of -f option code
+			
+	//main loop: send text entered to destination specified in arguments
 	
 	while(1){
-		cin >> buffer;
+		cin >> buffer;								//take in text
 		if( (buffer[0] == 'q') && (buffer[1] == '\0') ){
-			break;
+			break;											//quit on 'q' press
 		}
 		size_t request_length = strlen(buffer);
 		
-		packet p = packet(
+		//make the packet
+		packet p = packet(						//construct packet
 			DAT,
 			static_route_destination,
 			request_length,
@@ -80,10 +128,11 @@ int main(int argc, char* argv[]){
 			
 		cout << "packet:"<<p.data <<", "<<p.dest.addr<<"\n";
 		packet *j = &p;
+		
+		//actually send the packet
 		int n = sendto(sout,(void*)j,sizeof(packet),0,
 						(struct sockaddr *)&remote_address, remote_length);
-		if (n < 0){
-			//error("Sendto Error\n");
+		if (n < 0){										//error checking
 			cout<<"send error\n";
 		}
 		cout << "data sent\n";
