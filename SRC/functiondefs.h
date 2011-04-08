@@ -87,3 +87,22 @@ int recv(int sock, packet *p, sockaddr_in *fromaddr){
 	}
 	return n;
 }
+//int allocate socket_listen()
+
+//int allocate socket_send()
+
+int sendPacket(int socket, packet* p, sockaddr* dest){
+	cout << "packet:"<< p->data << ", " << p->dest.addr << "\n";
+
+	//actually send the packet
+	int n = sendto(socket,(void*)p,sizeof(packet),0,
+					(struct sockaddr *)dest, sizeof(struct sockaddr_in));
+	if (n < 0){												//error handling
+		cout<<"send error\n";
+	}
+	cout << "data sent\n";						//notification
+	return n;
+}
+
+//blocking receive packet(int socket, char*, sockaddr*)
+
