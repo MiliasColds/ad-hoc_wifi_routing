@@ -77,7 +77,7 @@ int main(int argc, char* argv[]){
 			sendPacket( port, j, &remote_sockaddress, next);
 			
 			//file loop - send packet, clear buffer, wait for recieve
-			while(ch!=EOF && count <= 30){
+			while(ch!=EOF || count <= 30){
 				
 				if(count == 30){
 					
