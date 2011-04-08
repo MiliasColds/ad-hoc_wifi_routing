@@ -72,7 +72,7 @@ int main(int argc, char* argv[]){
 					address next = table.getToAddress(p.dest);
 					
 					//actually send the packet
-					sendPacket(j, &remote_address, next);
+					sendPacket( port, j, &remote_address, next);
 					
 					//grab a socket to listen on
 					int sin = allocateListenSocket(port, &local_address);
@@ -138,7 +138,7 @@ int main(int argc, char* argv[]){
 		address next = table.getToAddress(p.dest);
 		
 		//send that thang
-		sendPacket( &p, &remote_address, next);
+		sendPacket( port, &p, &remote_address, next);
 
 	}
 	

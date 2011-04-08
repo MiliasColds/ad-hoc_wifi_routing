@@ -15,14 +15,14 @@ public :
   
 	address(){ }
   address(char inaddr[16]){
-		std::cerr << "hallo address constructor\n";
+		//std::cerr << "hallo address constructor\n";
 
 		strcpy(addr, inaddr);
 		char *tok = strtok(inaddr,".");
 		short x = 0;
 		while(tok !=  NULL){
 			short n = atoi(tok);
-			cout<<"n:"<<n<<"\n";
+			//cout<<"n:"<<n<<"\n";
 			switch(x) {
 				case 0:
 				A = n;
