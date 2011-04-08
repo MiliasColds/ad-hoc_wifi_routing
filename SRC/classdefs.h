@@ -121,7 +121,7 @@ class RouteTable {
 	}
 };
 
-typedef enum {ACK, DAT} packettype;
+typedef enum {ACK, DAT, FHP, EOM} packettype;
 
 class packet {
 public:

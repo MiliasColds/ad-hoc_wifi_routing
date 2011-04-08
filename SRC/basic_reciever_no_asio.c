@@ -42,6 +42,8 @@ int main(int argc, char* argv[]){
 	// bind socket to UDP port
 	int sin =  allocateListenSocket(port, &local_address);
 	
+	FILE *fp;
+	
 	while(1){
 		//recieve packet
 		cout << "waiting for message\n";
@@ -52,7 +54,32 @@ int main(int argc, char* argv[]){
 				cout<<"no error recieving\n";
 				if(p.dest.equals(&my_address)){
 					//THIS ONE FOR ME
-					printf("data recieved:%s -to: %s\n", p.data, p.dest.addr);
+					
+					switch(p.type){
+						case FHP:
+							//open file to begin writing
+							fp = fopen(p.data,"w");
+							//TODO: error checking on writing file
+						break;
+						
+						case DAT:
+						
+						if(fp != NULL){
+							//write to file
+							fprintf(fp, "%s", p.data);
+							printf("data written:%s -to: %s\n", p.data, p.dest.addr);
+
+						}else{
+							//print to screen
+							printf("data recieved:%s -to: %s\n", p.data, p.dest.addr);
+						}
+						break;
+						
+						case EOM:
+							fclose(fp);
+						break;
+					
+					}
 					
 					//get the next address from the table
 					address next = table.getToAddress(p.dest);
@@ -67,7 +94,8 @@ int main(int argc, char* argv[]){
 						0);
 					
 					//send an ACK
-					sendPacket(port, &q, &remote_address, next);
+					sendPacket(port, &q, &remote_address, next);	
+					
 				}else{
 					//NOT FOR ME
 					printf("Not my data, for: %s\n", p.dest.addr); 

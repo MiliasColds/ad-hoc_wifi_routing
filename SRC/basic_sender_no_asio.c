@@ -55,8 +55,15 @@ int main(int argc, char* argv[]){
 			int count = 0;
 			int ch = getc(fp);
 			
+			//get the next address from the table
+			address next = table.getToAddress(dest_raddress);
+			
+			//grab a socket to listen on
+			int sin = allocateListenSocket(port, &local_sockaddress);
+			
 			//file loop - send packet, clear buffer, wait for recieve
-			while(ch!=EOF){
+			while(ch!=EOF && count <= 30){
+				
 				if(count == 30){
 					
 					//make the packet
@@ -68,16 +75,12 @@ int main(int argc, char* argv[]){
 						buffer,
 						0);
 						
-						packet *j = &p;
-					
-					//get the next address from the table
-					address next = table.getToAddress(dest_raddress);
+					packet *j = &p;
+						
 					
 					//actually send the packet
 					sendPacket( port, j, &remote_sockaddress, next);
 					
-					//grab a socket to listen on
-					int sin = allocateListenSocket(port, &local_sockaddress);
 					
 					while(1){
 						//recieve packet
@@ -103,12 +106,15 @@ int main(int argc, char* argv[]){
 					}
 					//finally, got ack, continue
 					
-					
-					count = 0;
+					if(ch != EOF){
+						count = 0;
+					}
 				}
 				buffer[count] = ch;
 				count++;
-				ch = getc(fp);
+				if(ch != EOF){
+					ch = getc(fp);
+				}
 			}
 			
 			return 0;
