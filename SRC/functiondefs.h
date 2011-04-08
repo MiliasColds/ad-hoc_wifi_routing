@@ -56,6 +56,10 @@ void forwardTo(RouteTable t,packet p, int port){
 	//int n = sendto(sout,(void*)&p,sizeof(packet),0,
 	//				(struct sockaddr *)&remote_address, sizeof(struct sockaddr_in));
 	cout << "packet:"<<p.data <<", "<<p.dest.addr<<"\n";
+	
+	//IMPORTANT: increment hop count before forwarding
+	p.current_num_ints++;
+	
 	packet *j = &p;
 	int n = sendto(sout,(void*)j,sizeof(packet),0,
 					(struct sockaddr *)&remote_address, remote_length);
@@ -124,7 +128,6 @@ int sendPacket(int port, packet* p, sockaddr_in* dest_sockaddress, address next)
 	dest_sockaddress->sin_family = AF_INET;
 	dest_sockaddress->sin_port = htons(port);
 	//remote_address.sin_addr.s_addr = inet_addr(string_route_destination);
-	cout << next.addr << "\n";
 	inet_aton(next.addr, &((*dest_sockaddress).sin_addr));
 	
 	cout << "packet:"<< p->data << ", " << p->dest.addr << "\n";

@@ -37,10 +37,10 @@ int main(int argc, char* argv[]){
 	
 	
 	// allocate socket
+
 	
 	// bind socket to UDP port
 	int sin =  allocateListenSocket(port, &local_address);
-	
 	
 	while(1){
 		//recieve packet
@@ -56,8 +56,18 @@ int main(int argc, char* argv[]){
 					
 					//get the next address from the table
 					address next = table.getToAddress(p.dest);
+			
+					//make the packet
+					packet q = packet(						//construct packet
+						ACK,
+						p.dest,
+						p.source,
+						p.size,
+						p.data,
+						0);
+					
 					//send an ACK
-					sendPacket(port, &p, &remote_address, next);
+					sendPacket(port, &q, &remote_address, next);
 				}else{
 					//NOT FOR ME
 					printf("Not my data, for: %s\n", p.dest.addr); 

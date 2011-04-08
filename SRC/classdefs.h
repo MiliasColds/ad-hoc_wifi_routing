@@ -126,14 +126,16 @@ typedef enum {ACK, DAT} packettype;
 class packet {
 public:
 	packettype type;
+	address source;
 	address dest;
 	int size;
 	char data[256];
 	int current_num_ints;
 	
 	packet(){dest = address();};
-	packet(packettype pt, address d, int s, char indat[256], int n){
+	packet(packettype pt, address src, address d, int s, char indat[256], int n){
 		type = pt;
+		source = src;
 		dest = d;
 		size = s;
 		strncpy(data, indat, 256);
@@ -171,14 +173,3 @@ public:
 	}
 	
 };
-
-typedef struct{
-	packettype type;			//type of packet ACK or DATA
-	char dest[16];			//destination
-	int size;				//size of data field
-	char data[256];		//maximum size of data payload
-	int current_num_ints;		//number of intermediate nodes
-						//traversed by packet
-	char intermediate_nodes[8][16]; //array to hold ip
-// addresses of intermediate nodes
-} PACKET;
