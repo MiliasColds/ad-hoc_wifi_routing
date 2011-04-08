@@ -106,10 +106,9 @@ int allocateListenSocket(int port, struct sockaddr_in* local_address){
 	if ( bind( sin,(struct sockaddr*)local_address,sizeof(sockaddr_in) ) <0 ) {
 		cout<<"error binding\n";
 
-	
+	}
 	return sin;
   }
-}
 //int allocate socket_send()
 
 int sendPacket(int port, packet* p, sockaddr_in* dest, address next){
