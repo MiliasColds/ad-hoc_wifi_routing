@@ -105,9 +105,10 @@ int allocateListenSocket(int port, struct sockaddr_in* local_address){
 	// bind socket to UDP port
 	if ( bind( sin,(struct sockaddr*)local_address,sizeof(sockaddr_in) ) <0 ) {
 		cout<<"error binding\n";
-	}
+
 	
 	return sin;
+  }
 }
 //int allocate socket_send()
 
@@ -123,7 +124,7 @@ int sendPacket(int port, packet* p, sockaddr_in* dest, address next){
 	// setup socket
 	
 	dest->sin_family = AF_INET;
-	dest->sin_port = port;
+	dest->sin_port = htons(port);
 	//remote_address.sin_addr.s_addr = inet_addr(string_route_destination);
 	inet_aton(next.addr, &(dest->sin_addr));
 	
