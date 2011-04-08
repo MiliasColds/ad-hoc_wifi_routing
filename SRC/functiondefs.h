@@ -111,7 +111,7 @@ int allocateListenSocket(int port, struct sockaddr_in* local_address){
 }
 //int allocate socket_send()
 
-int sendPacket(packet* p, sockaddr_in* dest, address next){
+int sendPacket(packet* p, sockaddr_in* dest, address next,port){
 	
 	//allocate socket
 	int sout = socket(AF_INET, SOCK_DGRAM, 0);
@@ -123,7 +123,7 @@ int sendPacket(packet* p, sockaddr_in* dest, address next){
 	// setup socket
 	
 	dest->sin_family = AF_INET;
-	dest->sin_port = dest->sin_port;
+	dest->sin_port = port;
 	//remote_address.sin_addr.s_addr = inet_addr(string_route_destination);
 	inet_aton(next.addr, &(dest->sin_addr));
 	

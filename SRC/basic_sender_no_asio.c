@@ -43,7 +43,7 @@ int main(int argc, char* argv[]){
 	
 	//beginning of -f option code (MAIN WIFI LAB CODE)
   if(argc > 5){
-		if(argv[5] == "-f"){
+		if(strcmp(argv[5],"-f")==0){
 			//read file instead of read text
 			cin >> buffer;
 			
@@ -70,9 +70,9 @@ int main(int argc, char* argv[]){
 					
 					//get the next address from the table
 					address next = table.getToAddress(p.dest);
-					
+					//remote_address.sin_port = htons(port);
 					//actually send the packet
-					sendPacket(j, &remote_address, next);
+					sendPacket(j, &remote_address, next,port);
 					
 					//grab a socket to listen on
 					int sin = allocateListenSocket(port, &local_address);
@@ -138,7 +138,7 @@ int main(int argc, char* argv[]){
 		address next = table.getToAddress(p.dest);
 		
 		//send that thang
-		sendPacket( &p, &remote_address, next);
+		sendPacket( &p, &remote_address, next,port);
 
 	}
 	

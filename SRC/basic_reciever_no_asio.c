@@ -68,7 +68,7 @@ int main(int argc, char* argv[]){
 					//get the next address from the table
 					address next = table.getToAddress(p.dest);
 					//send an ACK
-					sendPacket(&p, &remote_address, next);
+					sendPacket(&p, &remote_address, next,port);
 				}else{
 					//NOT FOR ME
 					printf("Not my data, for: %s\n", p.dest.addr); 
