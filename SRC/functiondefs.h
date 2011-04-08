@@ -66,3 +66,24 @@ void forwardTo(RouteTable t,packet p, int port){
 	cout << "data sent\n";
 	close(sout);
 }
+
+
+int recv(int sock, packet *p, sockaddr_in *fromaddr){
+	socket_size = sizeof(sockaddr_in);
+	cout << "waiting for message\n";
+	n = recvfrom(sock,(void*)p,sizeof(packet),MSG_PEEK,
+				(struct sockaddr *)fromaddr,&socket_size);
+	//n = recv(sin,buffer,512*sizeof(char),MSG_PEEK);
+	if( n > 0 ){
+		//recv(sin,buffer,512*sizeof(char),0);
+		n = recvfrom(sock,(void*)p,sizeof(packet),0,
+				(struct sockaddr *)fromaddr,&socket_size);
+		
+		cout<<"no error recieving\n";
+		
+		
+	}else{
+		cout<<"error recieving\n";
+	}
+	return n;
+}

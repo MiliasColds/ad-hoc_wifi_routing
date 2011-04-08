@@ -56,30 +56,21 @@ int main(int argc, char* argv[]){
 	while(1){
 		//recieve packet
 		cout << "waiting for message\n";
-		n = recvfrom(sin,(void*)&p,sizeof(packet),MSG_PEEK,
-					(struct sockaddr *)&remote_address,&socket_size);
-		//n = recv(sin,buffer,512*sizeof(char),MSG_PEEK);
-		if( n > 0 ){
-			//recv(sin,buffer,512*sizeof(char),0);
-			n = recvfrom(sin,(void*)&p,sizeof(packet),0,
-					(struct sockaddr *)&remote_address,&socket_size);
 			
 			cout<<"no error recieving\n";
-			printf("data recieved:%s -to: %s\n", p.data, p.dest.addr); 
-
+			n = recv(sin,&p,&remote_address);
 			//forward the packet if not for us
-			if(p.dest.equals(&my_address)){
-				//THIS ONE FOR ME
-				printf("ALL MINE!!!?\n"); 
-			}else{
-				//NOT FOR ME
-				printf("Opps :-X I eavesdropped!\n"); 
-				forwardTo(table, p, port);
+			if(n>0){
+				if(p.dest.equals(&my_address)){
+					//THIS ONE FOR ME
+					printf("ALL MINE!!!?\n"); 
+					printf("data recieved:%s -to: %s\n", p.data, p.dest.addr);
+				}else{
+					//NOT FOR ME
+					printf("Opps :-X I eavesdropped!\n"); 
+					forwardTo(table, p, port);
+				}
 			}
-			
-		}else{
-			cout<<"error recieving\n";
-		}
 		cout<<"waiting\n";
 		//rebuild packet
 		//packet p = packet(buffer);
