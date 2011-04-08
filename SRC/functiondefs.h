@@ -111,7 +111,7 @@ int allocateListenSocket(int port, struct sockaddr_in* local_address){
 }
 //int allocate socket_send()
 
-int sendPacket(packet* p, sockaddr_in* dest, address next,port){
+int sendPacket(int port, packet* p, sockaddr_in* dest, address next){
 	
 	//allocate socket
 	int sout = socket(AF_INET, SOCK_DGRAM, 0);
