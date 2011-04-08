@@ -18,16 +18,16 @@ int main(int argc, char* argv[]){
 		std::cerr << "or: basic_sender <route_dest> <route_next> <port> -f\n";
 
 		return 1;
-  }
-  
-  struct sockaddr_in local_address, remote_address;
+	}
+	
+	struct sockaddr_in local_address, remote_address;
 	struct hostent *server;
 	
 	char string_route_destination[16];
 	strncpy(string_route_destination, argv[1], 16);
 	char string_route_next[16];
 	strncpy(string_route_next, argv[2], 16);
-
+	
 	int port = atoi(argv[3]);
 	char buffer[256];
 	bzero(buffer,256);
@@ -54,7 +54,6 @@ int main(int argc, char* argv[]){
 	//initialize the static route table
 	RouteTable table = RouteTable();
 	table.addEntry(static_route_destination, static_route_next);
-	//server = gethostbyname(string_route_next);
 	
 	//beginning of -f option code (MAIN WIFI LAB CODE)
   if(argc > 4){
@@ -76,7 +75,7 @@ int main(int argc, char* argv[]){
 					packet p = packet(						//construct packet
 						DAT,
 						static_route_destination,
-						request_length,
+						strlen(buffer),
 						buffer,
 						0);
 						
@@ -84,12 +83,14 @@ int main(int argc, char* argv[]){
 					packet *j = &p;
 					
 					//actually send the packet
-					int n = sendto(sout,(void*)j,sizeof(packet),0,
+					sendPacket(sout, j, (struct sockaddr *)&remote_address);
+					
+					/*int n = sendto(sout,(void*)j,sizeof(packet),0,
 									(struct sockaddr *)&remote_address, strlen(buffer));
 					if (n < 0){										//error checking
 						cout<<"send error\n";
 					}
-					cout << "data sent\n";
+					cout << "data sent\n";*/
 					
 					//wait for ack...
 					
@@ -103,7 +104,7 @@ int main(int argc, char* argv[]){
 				ch = getc(fp);
 			}
 			
-			return;
+			return 0;
 		}
 		
 	}
@@ -126,7 +127,10 @@ int main(int argc, char* argv[]){
 			buffer,
 			0);
 			
-		cout << "packet:"<<p.data <<", "<<p.dest.addr<<"\n";
+		packet *j = &p;
+		
+		sendPacket(sout, &p, (struct sockaddr *)&remote_address);
+		/*cout << "packet:"<<p.data <<", "<<p.dest.addr<<"\n";
 		packet *j = &p;
 		
 		//actually send the packet
@@ -135,7 +139,7 @@ int main(int argc, char* argv[]){
 		if (n < 0){										//error checking
 			cout<<"send error\n";
 		}
-		cout << "data sent\n";
+		cout << "data sent\n";*/
 	}
 	
 	
