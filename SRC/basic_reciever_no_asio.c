@@ -57,26 +57,25 @@ int main(int argc, char* argv[]){
 		//recieve packet
 		cout << "waiting for message\n";
 			
-			cout<<"no error recieving\n";
 			n = recv(sin,&p,&remote_address);
 			//forward the packet if not for us
 			if(n>0){
+				cout<<"no error recieving\n";
 				if(p.dest.equals(&my_address)){
 					//THIS ONE FOR ME
-					printf("ALL MINE!!!?\n"); 
 					printf("data recieved:%s -to: %s\n", p.data, p.dest.addr);
+					
+					//get the next address from the table
+					address next = table.getToAddress(p.dest);
+					//send an ACK
+					sendPacket(&p, &remote_address, next);
 				}else{
 					//NOT FOR ME
-					printf("Opps :-X I eavesdropped!\n"); 
+					printf("Not my data, for: %s\n", p.dest.addr); 
 					forwardTo(table, p, port);
 				}
 			}
-		cout<<"waiting\n";
-		//rebuild packet
-		//packet p = packet(buffer);
-		
-		//print data
-		//printf("data recieved:%s -to: %s\n", p.data, p.dest.addr); 
+
 	}
 
 	close(sin);

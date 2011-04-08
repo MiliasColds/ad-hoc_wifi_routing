@@ -69,9 +69,9 @@ void forwardTo(RouteTable t,packet p, int port){
 
 
 int recv(int sock, packet *p, sockaddr_in *fromaddr){
-	socket_size = sizeof(sockaddr_in);
+	socklen_t socket_size = sizeof(sockaddr_in);
 	cout << "waiting for message\n";
-	n = recvfrom(sock,(void*)p,sizeof(packet),MSG_PEEK,
+	int n = recvfrom(sock,(void*)p,sizeof(packet),MSG_PEEK,
 				(struct sockaddr *)fromaddr,&socket_size);
 	//n = recv(sin,buffer,512*sizeof(char),MSG_PEEK);
 	if( n > 0 ){
@@ -87,20 +87,61 @@ int recv(int sock, packet *p, sockaddr_in *fromaddr){
 	}
 	return n;
 }
-//int allocate socket_listen()
 
+
+int allocateListenSocket(int port, struct sockaddr_in* local_address){
+	// allocate socket
+	int sin = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (sin < 0){
+		cout << "socket error\n";
+	}
+	
+	//setup socket
+	memset(local_address, 0, sizeof(sockaddr_in));
+	local_address->sin_family = AF_INET;
+	local_address->sin_port = htons(port);
+	local_address->sin_addr.s_addr= htonl(INADDR_ANY);
+	
+	// bind socket to UDP port
+	if ( bind( sin,(struct sockaddr*)local_address,sizeof(sockaddr_in) ) <0 ) {
+		cout<<"error binding\n";
+	}
+	
+	return sin;
+}
 //int allocate socket_send()
 
-int sendPacket(int socket, packet* p, sockaddr* dest){
+int sendPacket(packet* p, sockaddr_in* dest, address next){
+	
+	//allocate socket
+	int sout = socket(AF_INET, SOCK_DGRAM, 0);
+	if (sout < 0){
+		cout<<"socket create failed\n";
+		//error("Socket Error\n");
+	}
+	
+	// setup socket
+	
+	dest->sin_family = AF_INET;
+	dest->sin_port = dest->sin_port;
+	//remote_address.sin_addr.s_addr = inet_addr(string_route_destination);
+	inet_aton(next.addr, &(dest->sin_addr));
+	
+	socklen_t remote_length = sizeof(struct sockaddr_in);
+	
 	cout << "packet:"<< p->data << ", " << p->dest.addr << "\n";
 
 	//actually send the packet
-	int n = sendto(socket,(void*)p,sizeof(packet),0,
+	int n = sendto(sout,(void*)p,sizeof(packet),0,
 					(struct sockaddr *)dest, sizeof(struct sockaddr_in));
 	if (n < 0){												//error handling
 		cout<<"send error\n";
 	}
 	cout << "data sent\n";						//notification
+	
+	//close socket
+	close(sout);
+
 	return n;
 }
 

@@ -13,22 +13,23 @@
 
 
 int main(int argc, char* argv[]){
-	if (argc < 4){
-		std::cerr << "Usage: basic_sender <route_dest> <route_next> <port>\n";
-		std::cerr << "or: basic_sender <route_dest> <route_next> <port> -f\n";
+	if (argc < 5){
+		std::cerr << "Usage: basic_sender <route_dest> <route_next> <my address> <port>\n";
+		std::cerr << "or: basic_sender <route_dest> <route_next> <my address> <port> -f\n";
 
 		return 1;
 	}
 	
 	struct sockaddr_in local_address, remote_address;
-	struct hostent *server;
 	
 	char string_route_destination[16];
 	strncpy(string_route_destination, argv[1], 16);
 	char string_route_next[16];
 	strncpy(string_route_next, argv[2], 16);
 	
-	int port = atoi(argv[3]);
+	address my_address = address(argv[3]);
+	
+	int port = atoi(argv[4]);
 	char buffer[256];
 	bzero(buffer,256);
 	
@@ -36,28 +37,13 @@ int main(int argc, char* argv[]){
 	address static_route_destination = address( string_route_destination );
 	address static_route_next = address( string_route_next );
 	
-	// allocate socket
-	int sout = socket(AF_INET, SOCK_DGRAM, 0);
-	if (sout < 0){
-		cout<<"socket create failed\n";
-		//error("Socket Error\n");
-	}
-	
-	// setup socket
-	remote_address.sin_family = AF_INET;
-	remote_address.sin_port = htons(port);
-	//remote_address.sin_addr.s_addr = inet_addr(string_route_destination);
-	inet_aton(static_route_next.addr, &remote_address.sin_addr);
-	
-	socklen_t remote_length = sizeof(struct sockaddr_in);
-	
 	//initialize the static route table
 	RouteTable table = RouteTable();
 	table.addEntry(static_route_destination, static_route_next);
 	
 	//beginning of -f option code (MAIN WIFI LAB CODE)
-  if(argc > 4){
-		if(argv[4] == "-f"){
+  if(argc > 5){
+		if(argv[5] == "-f"){
 			//read file instead of read text
 			cin >> buffer;
 			
@@ -82,18 +68,37 @@ int main(int argc, char* argv[]){
 					cout << "packet:"<<p.data <<", "<<p.dest.addr<<"\n";
 					packet *j = &p;
 					
+					//get the next address from the table
+					address next = table.getToAddress(p.dest);
+					
 					//actually send the packet
-					sendPacket(sout, j, (struct sockaddr *)&remote_address);
+					sendPacket(j, &remote_address, next);
 					
-					/*int n = sendto(sout,(void*)j,sizeof(packet),0,
-									(struct sockaddr *)&remote_address, strlen(buffer));
-					if (n < 0){										//error checking
-						cout<<"send error\n";
+					//grab a socket to listen on
+					int sin = allocateListenSocket(port, &local_address);
+					
+					while(1){
+						//recieve packet
+						cout << "waiting for message\n";
+							
+						int n = recv(sin,&p,&remote_address);
+						//forward the packet if not for us
+						if(n>0){
+							if(p.dest.equals(&my_address)){
+								//THIS ONE FOR ME
+								printf("data recieved:%s -to: %s\n", p.data, p.dest.addr);
+								if(p.type == ACK){
+									//THIS IS WHAT WE'VE BEEN WAITING FOR OUR ENTIRE LIVES
+									break;
+								}
+							}else{
+								//NOT FOR ME
+								printf("Not my data, for: %s\n", p.dest.addr); 
+								forwardTo(table, p, port);
+							}
+						}
+							
 					}
-					cout << "data sent\n";*/
-					
-					//wait for ack...
-					
 					//finally, got ack, continue
 					
 					
@@ -129,20 +134,13 @@ int main(int argc, char* argv[]){
 			
 		packet *j = &p;
 		
-		sendPacket(sout, &p, (struct sockaddr *)&remote_address);
-		/*cout << "packet:"<<p.data <<", "<<p.dest.addr<<"\n";
-		packet *j = &p;
+		//get the next address from the table
+		address next = table.getToAddress(p.dest);
 		
-		//actually send the packet
-		int n = sendto(sout,(void*)j,sizeof(packet),0,
-						(struct sockaddr *)&remote_address, remote_length);
-		if (n < 0){										//error checking
-			cout<<"send error\n";
-		}
-		cout << "data sent\n";*/
+		//send that thang
+		sendPacket( &p, &remote_address, next);
+
 	}
 	
-	
-	close(sout);
 	return 0;
 }
