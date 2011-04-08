@@ -51,7 +51,7 @@ int main(int argc, char* argv[]){
 			FILE *fp = fopen(argv[4],"r");
 			
 			int count = 0;
-			char ch = getc(fp);
+			int ch = getc(fp);
 			
 			//file loop - send packet, clear buffer, wait for recieve
 			while(ch!=EOF){
