@@ -115,7 +115,7 @@ int main(int argc, char* argv[]){
 								forwardTo(table, p, port);
 							}
 						}
-							
+					
 					}
 					//finally, got ack, continue
 					
@@ -123,7 +123,11 @@ int main(int argc, char* argv[]){
 						count = 0;
 					}
 				}
-				buffer[count] = ch;
+				if(ch != EOF){
+					buffer[count] = ch;
+				}else{
+					buffer[count] = 0;
+				}
 				count++;
 				if(ch != EOF){
 					ch = getc(fp);
