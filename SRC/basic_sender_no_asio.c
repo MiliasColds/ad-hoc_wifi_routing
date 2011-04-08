@@ -42,7 +42,7 @@ int main(int argc, char* argv[]){
 			cin >> buffer;
 			
 			//open file for reading
-			FILE *fp = fopen(argv[4],"r");
+			FILE *fp = fopen(buffer,"r");
 			
 			int count = 0;
 			int ch = getc(fp);
