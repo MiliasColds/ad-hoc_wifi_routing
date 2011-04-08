@@ -14,32 +14,26 @@
 
 int main(int argc, char* argv[]){
 	if (argc < 5){
-		std::cerr << "Usage: basic_sender <route_dest> <route_next> <my address> <port>\n";
-		std::cerr << "or: basic_sender <route_dest> <route_next> <my address> <port> -f\n";
+		std::cerr << "Usage: basic_sender <local ipaddress> <route_dest> <route_next> <port>\n";
+		std::cerr << "or: basic_sender <local ipaddress> <route_dest> <route_next> <port> -f\n";
 
 		return 1;
 	}
 	
-	struct sockaddr_in local_address, remote_address;
+	struct sockaddr_in local_sockaddress, remote_sockaddress;
 	
-	char string_route_destination[16];
-	strncpy(string_route_destination, argv[1], 16);
-	char string_route_next[16];
-	strncpy(string_route_next, argv[2], 16);
-	
-	address my_address = address(argv[3]);
+	address local_raddress = address(argv[1]);
+	address next_raddress = address(argv[2]);
+	address dest_raddress = address(argv[3]);
 	
 	int port = atoi(argv[4]);
 	char buffer[256];
 	bzero(buffer,256);
 	
-	//take in commandline arguments for easy(ier) reading
-	address static_route_destination = address( string_route_destination );
-	address static_route_next = address( string_route_next );
 	
 	//initialize the static route table
 	RouteTable table = RouteTable();
-	table.addEntry(static_route_destination, static_route_next);
+	staticRoutes(&table,next_raddress);
 	
 	//beginning of -f option code (MAIN WIFI LAB CODE)
   if(argc > 5){
@@ -60,7 +54,7 @@ int main(int argc, char* argv[]){
 					//make the packet
 					packet p = packet(						//construct packet
 						DAT,
-						static_route_destination,
+						dest_raddress,
 						strlen(buffer),
 						buffer,
 						0);
@@ -72,19 +66,19 @@ int main(int argc, char* argv[]){
 					address next = table.getToAddress(p.dest);
 					//remote_address.sin_port = htons(port);
 					//actually send the packet
-					sendPacket( port, j, &remote_address, next);
+					sendPacket( port, j, &remote_sockaddress, next);
 					
 					//grab a socket to listen on
-					int sin = allocateListenSocket(port, &local_address);
+					int sin = allocateListenSocket(port, &local_sockaddress);
 					
 					while(1){
 						//recieve packet
 						cout << "waiting for message\n";
 							
-						int n = recv(sin,&p,&remote_address);
+						int n = recv(sin,&p,&remote_sockaddress);
 						//forward the packet if not for us
 						if(n>0){
-							if(p.dest.equals(&my_address)){
+							if(p.dest.equals(&local_raddress)){
 								//THIS ONE FOR ME
 								printf("data recieved:%s -to: %s\n", p.data, p.dest.addr);
 								if(p.type == ACK){
@@ -127,7 +121,7 @@ int main(int argc, char* argv[]){
 		//make the packet
 		packet p = packet(						//construct packet
 			DAT,
-			static_route_destination,
+			dest_raddress,
 			request_length,
 			buffer,
 			0);
@@ -138,7 +132,8 @@ int main(int argc, char* argv[]){
 		address next = table.getToAddress(p.dest);
 		
 		//send that thang
-		sendPacket( port, &p, &remote_address, next);
+		sendPacket( port, &p, &remote_sockaddress, next);
+
 	}
 	
 	return 0;

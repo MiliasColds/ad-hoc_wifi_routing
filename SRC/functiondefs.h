@@ -101,7 +101,7 @@ int allocateListenSocket(int port, struct sockaddr_in* local_address){
 	local_address->sin_family = AF_INET;
 	local_address->sin_port = htons(port);
 	local_address->sin_addr.s_addr= htonl(INADDR_ANY);
-	
+	cout << "binding on port " << port << "\n";
 	// bind socket to UDP port
 	if ( bind( sin,(struct sockaddr*)local_address,sizeof(sockaddr_in) ) <0 ) {
 		cout<<"error binding\n";

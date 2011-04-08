@@ -14,7 +14,7 @@
 
 int main(int argc, char* argv[]){
 	if (argc < 4){
-		std::cerr << "Usage: basic_reciever <own address> <forwarding address> <port>\n";
+		std::cerr << "Usage: basic_reciever <my address> <forwarding address> <port>\n";
 		return 1;
 	}
 	
@@ -43,14 +43,7 @@ int main(int argc, char* argv[]){
 	}
 	
 	// bind socket to UDP port
-	memset(&local_address, 0, socket_size);
-	local_address.sin_family = AF_INET;
-	local_address.sin_port = htons(port);
-	local_address.sin_addr.s_addr= htonl(INADDR_ANY);
-	
-	if ( bind( sin,(struct sockaddr*)&local_address,sizeof(local_address) ) <0 ) {
-		cout<<"error binding\n";
-	}
+	int allocateListenSocket(int port, struct sockaddr_in* local_address){
 	
 	
 	while(1){
