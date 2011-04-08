@@ -67,6 +67,16 @@ int main(int argc, char* argv[]){
 					
 					//get the next address from the table
 					address next = table.getToAddress(p.dest);
+					
+					//make the packet
+					packet p = packet(						//construct packet
+						ACK,
+						p.dest,
+						p.source,
+						p.size,
+						p.data,
+						0);
+					
 					//send an ACK
 					sendPacket(port, &p, &remote_address, next);
 				}else{

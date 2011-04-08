@@ -62,6 +62,7 @@ int main(int argc, char* argv[]){
 					//make the packet
 					packet p = packet(						//construct packet
 						DAT,
+						local_raddress,
 						dest_raddress,
 						strlen(buffer),
 						buffer,
@@ -128,6 +129,7 @@ int main(int argc, char* argv[]){
 		//make the packet
 		packet p = packet(						//construct packet
 			DAT,
+			local_raddress,
 			dest_raddress,
 			request_length,
 			buffer,
