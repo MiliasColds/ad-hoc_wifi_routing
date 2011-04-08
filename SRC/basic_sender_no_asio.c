@@ -22,9 +22,17 @@ int main(int argc, char* argv[]){
 	
 	struct sockaddr_in local_sockaddress, remote_sockaddress;
 	
-	address local_raddress = address(argv[1]);
-	address next_raddress = address(argv[2]);
-	address dest_raddress = address(argv[3]);
+	char local_string[16];
+	strncpy(local_string, argv[1], 16);
+	address local_raddress = address(local_string);
+	
+	char dest_string[16];
+	strncpy(dest_string, argv[2], 16);
+	address dest_raddress = address(dest_string);
+
+	char next_string[16];
+	strncpy(next_string, argv[3], 16);
+	address next_raddress = address(next_string);
 	
 	int port = atoi(argv[4]);
 	char buffer[256];
@@ -59,12 +67,11 @@ int main(int argc, char* argv[]){
 						buffer,
 						0);
 						
-					cout << "packet:"<<p.data <<", "<<p.dest.addr<<"\n";
-					packet *j = &p;
+						packet *j = &p;
 					
 					//get the next address from the table
-					address next = table.getToAddress(p.dest);
-					//remote_address.sin_port = htons(port);
+					address next = table.getToAddress(dest_raddress);
+					
 					//actually send the packet
 					sendPacket( port, j, &remote_sockaddress, next);
 					
