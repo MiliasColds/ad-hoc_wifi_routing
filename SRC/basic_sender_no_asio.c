@@ -37,12 +37,12 @@ int main(int argc, char* argv[]){
 	
 	//beginning of -f option code (MAIN WIFI LAB CODE)
   if(argc > 5){
-		if(strcmp(argv[5],"-f")){
+		if(strcmp(argv[5],"-f")==0){
 			//read file instead of read text
 			cin >> buffer;
 			
 			//open file for reading
-			FILE *fp = fopen(argv[4],"r");
+			FILE *fp = fopen(buffer,"r");
 			
 			int count = 0;
 			int ch = getc(fp);
