@@ -128,15 +128,15 @@ public:
 	packettype type;
 	address dest;
 	int size;
-	char data[30];
+	char data[256];
 	int current_num_ints;
 	
 	packet(){dest = address();};
-	packet(packettype pt, address d, int s, char indat[30], int n){
+	packet(packettype pt, address d, int s, char indat[256], int n){
 		type = pt;
 		dest = d;
 		size = s;
-		strncpy(data, indat, 30);
+		strncpy(data, indat, 256);
 		current_num_ints = n;
 	}
 	packet(string buffer){
@@ -154,8 +154,8 @@ public:
 		char* charsize;
 		charsize = (char*)&size;
 		
-		char chardata[30];
-		strncpy(chardata, data, 30);
+		char chardata[256];
+		strncpy(chardata, data, 256);
 		
 		char* charn;
 		charn = (char*)&current_num_ints;
@@ -176,7 +176,7 @@ typedef struct{
 	packettype type;			//type of packet ACK or DATA
 	char dest[16];			//destination
 	int size;				//size of data field
-	char data[30];		//maximum size of data payload
+	char data[256];		//maximum size of data payload
 	int current_num_ints;		//number of intermediate nodes
 						//traversed by packet
 	char intermediate_nodes[8][16]; //array to hold ip

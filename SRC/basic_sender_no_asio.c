@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "classdefs.h"
+#include "functiondefs.h"
 
 
 int main(int argc, char* argv[]){

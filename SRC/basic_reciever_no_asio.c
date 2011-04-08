@@ -10,44 +10,49 @@
 
 #include <fcntl.h>
 
-#include "classdefs.h"
+#include "functiondefs.h"
 
 int main(int argc, char* argv[]){
-	if (argc < 2){
-		std::cerr << "Usage: basic_reciever <port>\n";
+	if (argc < 4){
+		std::cerr << "Usage: basic_reciever <own address> <forwarding address> <port>\n";
 		return 1;
 	}
-
+	
+	address my_address = address(argv[1]);
+	address next_address = address(argv[2]);
+	
 	int n;
 	socklen_t socket_size;
 	struct sockaddr_in local_address, remote_address;
 	struct hostent *server;
 	socket_size = sizeof(sockaddr_in);
 	packet p;
-	int port = atoi(argv[1]);
+	int port = atoi(argv[3]);
 	char buffer[512];
 	bzero(buffer,512);
-
+	
 	//initialize the static route table
 	RouteTable table = RouteTable();
-
+	staticRoutes(&table,next_address);
+	
+	
 	// allocate socket
 	int sin = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sin < 0){
 		cout << "socket error\n";
 	}
-
+	
 	// bind socket to UDP port
 	memset(&local_address, 0, socket_size);
 	local_address.sin_family = AF_INET;
 	local_address.sin_port = htons(port);
 	local_address.sin_addr.s_addr= htonl(INADDR_ANY);
-
+	
 	if ( bind( sin,(struct sockaddr*)&local_address,sizeof(local_address) ) <0 ) {
 		cout<<"error binding\n";
 	}
-
-
+	
+	
 	while(1){
 		//recieve packet
 		cout << "waiting for message\n";
@@ -58,17 +63,27 @@ int main(int argc, char* argv[]){
 			//recv(sin,buffer,512*sizeof(char),0);
 			n = recvfrom(sin,(void*)&p,sizeof(packet),0,
 					(struct sockaddr *)&remote_address,&socket_size);
-			//printf("data recieved:%s -to: \n", buffer);
+			
 			cout<<"no error recieving\n";
 			printf("data recieved:%s -to: %s\n", p.data, p.dest.addr); 
 
+			//forward the packet if not for us
+			if(p.dest.equals(&my_address)){
+				//THIS ONE FOR ME
+				printf("ALL MINE!!!?\n"); 
+			}else{
+				//NOT FOR ME
+				printf("Opps :-X I eavesdropped!\n"); 
+				forwardTo(table, p, port);
+			}
+			
 		}else{
 			cout<<"error recieving\n";
 		}
 		cout<<"waiting\n";
 		//rebuild packet
 		//packet p = packet(buffer);
-
+		
 		//print data
 		//printf("data recieved:%s -to: %s\n", p.data, p.dest.addr); 
 	}

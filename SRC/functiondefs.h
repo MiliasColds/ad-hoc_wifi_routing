@@ -1,14 +1,23 @@
-#include <vector.h>
-#include <string.h>
+#include <vector>
+#include <string>
 #include <stdio.h>
-#include <iostream.h>
+#include <iostream>
 #include <math.h>
 #include "classdefs.h"
 
 using namespace std;
 
+void staticRoutes(RouteTable* rt, address next){
+	char hosts[6][16] = {"192.168.5.66", "192.168.5.74", "192.168.5.76", "192.168.5.95", "192.168.5.118", "192.168.5.131"};
+	for( int i = 0; i < 6; i++){
+		address tmp = address(hosts[i]);
+		rt->addEntry(tmp,next.addr);
+	}
+	
+	return;
+}
 
-void forwardTo(RouteTable t,packet p){
+void forwardTo(RouteTable t,packet p, int port){
   
   struct sockaddr_in local_address, remote_address;
 	struct hostent *server;
@@ -16,9 +25,8 @@ void forwardTo(RouteTable t,packet p){
 	char string_route_destination[16];
 	strncpy(string_route_destination, p.dest.addr, 16);
 	char string_route_next[16];
-	strncpy(string_route_next, p.next.addr, 16);
 
-	int port = atoi(argv[3]);
+
 	char buffer[256];
 	bzero(buffer,256);
 	
@@ -26,15 +34,7 @@ void forwardTo(RouteTable t,packet p){
 	address static_route_destination = address( string_route_destination );
 	address static_route_next = address( string_route_next );
 	
-	//initialize the static route table
-	//RouteTable table = RouteTable();
-	//table.addEntry(static_route_destination, static_route_next);
-	//server = gethostbyname(string_route_next);
-	//make the packet
-	char data[30] = "the good the bad and the ugly";
-	size_t request_length = strlen(data);
-	
-	p.next = t.getToAddress(static_route_destination);
+	static_route_next = t.getToAddress(static_route_destination);
 	
 	// allocate socket
 	int sout = socket(AF_INET, SOCK_DGRAM, 0);
