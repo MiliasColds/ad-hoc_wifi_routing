@@ -8,10 +8,10 @@
 using namespace std;
 
 void staticRoutes(RouteTable* rt, address next){
-	char hosts[6][16] = {"192.168.5.66", "192.168.5.74", "192.168.5.76", "192.168.5.95", "192.168.5.118", "192.168.5.131"};
-	for( int i = 0; i < 6; i++){
+	char hosts[8][16] = {"192.168.5.66", "192.168.5.74", "192.168.5.76", "192.168.5.95", "192.168.5.118", "192.168.5.131", "137.112.152.131", "137.112.152.206"};
+	for( int i = 0; i < 8; i++){
 		address tmp = address(hosts[i]);
-		rt->addEntry(tmp,next.addr);
+		rt->addEntry(tmp,next);
 	}
 	
 	return;
@@ -88,8 +88,8 @@ int recv(int sock, packet *p, sockaddr_in *fromaddr){
 	return n;
 }
 
-
-int allocateListenSocket(int port, struct sockaddr_in* local_address){
+//allocates a socket listening to specified port for incoming packets
+int allocateListenSocket(int port, struct sockaddr_in* local_sockaddress){
 	// allocate socket
 	int sin = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sin < 0){
@@ -97,43 +97,41 @@ int allocateListenSocket(int port, struct sockaddr_in* local_address){
 	}
 	
 	//setup socket
-	memset(local_address, 0, sizeof(sockaddr_in));
-	local_address->sin_family = AF_INET;
-	local_address->sin_port = htons(port);
-	local_address->sin_addr.s_addr= htonl(INADDR_ANY);
+	memset(local_sockaddress, 0, sizeof(sockaddr_in));
+	local_sockaddress->sin_family = AF_INET;
+	local_sockaddress->sin_port = htons(port);
+	local_sockaddress->sin_addr.s_addr= htonl(INADDR_ANY);
 	
 	// bind socket to UDP port
-	if ( bind( sin,(struct sockaddr*)local_address,sizeof(sockaddr_in) ) <0 ) {
+	if ( bind( sin,(struct sockaddr*)local_sockaddress,sizeof(sockaddr_in) ) <0 ) {
 		cout<<"error binding\n";
 	}
 	
 	return sin;
 }
-//int allocate socket_send()
 
-int sendPacket(int port, packet* p, sockaddr_in* dest, address next){
+//allocates a temporary socket to send a UDP packet
+int sendPacket(int port, packet* p, sockaddr_in* dest_sockaddress, address next){
 	
 	//allocate socket
 	int sout = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sout < 0){
 		cout<<"socket create failed\n";
-		//error("Socket Error\n");
 	}
 	
 	// setup socket
 	
-	dest->sin_family = AF_INET;
-	dest->sin_port = htons(port);
+	dest_sockaddress->sin_family = AF_INET;
+	dest_sockaddress->sin_port = htons(port);
 	//remote_address.sin_addr.s_addr = inet_addr(string_route_destination);
-	inet_aton(next.addr, &(dest->sin_addr));
-	
-	socklen_t remote_length = sizeof(struct sockaddr_in);
+	cout << next.addr << "\n";
+	inet_aton(next.addr, &((*dest_sockaddress).sin_addr));
 	
 	cout << "packet:"<< p->data << ", " << p->dest.addr << "\n";
-
+	
 	//actually send the packet
 	int n = sendto(sout,(void*)p,sizeof(packet),0,
-					(struct sockaddr *)dest, sizeof(struct sockaddr_in));
+					(struct sockaddr *)dest_sockaddress, sizeof(struct sockaddr));
 	if (n < 0){												//error handling
 		cout<<"send error\n";
 	}
@@ -144,6 +142,4 @@ int sendPacket(int port, packet* p, sockaddr_in* dest, address next){
 
 	return n;
 }
-
-//blocking receive packet(int socket, char*, sockaddr*)
 
