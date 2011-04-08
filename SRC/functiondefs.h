@@ -109,8 +109,8 @@ int allocateListenSocket(int port, struct sockaddr_in* local_sockaddress){
 	// bind socket to UDP port
 	if ( bind( sin,(struct sockaddr*)local_sockaddress,sizeof(sockaddr_in) ) <0 ) {
 		cout<<"error binding\n";
+
 	}
-	
 	return sin;
 }
 
